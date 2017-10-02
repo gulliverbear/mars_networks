@@ -51,21 +51,48 @@ def connect_to_network(distance_matrix, id_probe_dict, connected_set):
     given a set of connected probes, looks for the closest unconnected probe
     to any of the connected probes, makes that connection 
     '''
-    # to do
+    global total_distance
+    min_distance = BIG_NUMBER
+    for probe1_id in connected_set:
+        row = distance_matrix[probe1_id]
+        row_min = min(row)
+        if row_min < min_distance:
+            min_distance = row_min
+            min_row = probe1_id
+            min_col = row.index(min_distance)
+    connect_pair(distance_matrix, min_row, min_col, id_probe_dict)
+    total_distance += min_distance
+    #print 'connected {} and {}'.format(min_row, min_col)
+    return {min_row, min_col}
     
 def connect_pair(distance_matrix, id1, id2, id_probe_dict):
     '''
     given 2 ids, will mark those corresponding probes as connected
     Also will set their distances to the max
     '''
-    # to do
+    probe1 = id_probe_dict[id1]
+    probe2 = id_probe_dict[id2]
+    probe1.connected = True
+    probe2.connected = True
+    distance_matrix[id1][id2] = BIG_NUMBER
+    distance_matrix[id2][id1] = BIG_NUMBER
+    reset_column(distance_matrix, id1)
+    reset_column(distance_matrix, id2)
         
 def pairwise_distances(probes, id_probe_dict):
     '''
     given a set of probes calculate all pairwise distances
     returns as a 2d array
     '''
-    # to do
+    n_probes = len(probes)
+    distance_matrix = [[BIG_NUMBER for _ in xrange(n_probes)] for _ in xrange(n_probes)]
+    for id1 in id_probe_dict:
+        for id2 in id_probe_dict:
+            if id1 != id2:
+                distance = id_probe_dict[id1].distance_to(id_probe_dict[id2])
+                distance_matrix[id1][id2] = distance
+                distance_matrix[id2][id1] = distance
+    return distance_matrix
 
 def get_id_probe_dict(probes):
     '''
